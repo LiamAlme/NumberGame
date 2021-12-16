@@ -1,54 +1,65 @@
-import pygame as pg
-import random
+from replit import db
+import stdiomask
 
-pg.init()
-clock = pg.time.Clock()
-screen = pg.display.set_mode([800,500])
-font = pg.font.Font(None,32)
-anstxt = ''
-newproblem = True
-correct = 0
-incorrect = 0
-
-while True:
-    for event in pg.event.get():
-        if event.type == pg.QUIT:
-            pg.quit()
-        if event.type == pg.KEYDOWN:
-            if event.key == pg.K_BACKSPACE:
-                anstxt = anstxt[:-1]
-            elif event.key == pg.K_RETURN:
-                anstxt = ''
-                if anstxt == str(ans):
-                    correct += 1
-                    newproblem = True
-                else:
-                    incorrect += 1
-                    newproblem = True
-            else:
-                anstxt += event.unicode
+keys = db.keys()
 
 
-    if newproblem == True:
-        num1 = random.randint(0,10)
-        num2 = random.randint(0,10)
-        ans = num1+num2
-        newproblem = False
+def score(us, s):
+    score = s
+    usern = us
+    fh = open("scoes.txt", "w")
+    fh.write(usern + " ")
+    fh.write(str(score))
 
-    screen.fill((0, 0, 0))
 
-    ans_surface = font.render(anstxt,True,(255,255,255))
-    screen.blit(ans_surface,(380,200))
+def get_score():
+    fh = open("scoes.txt", "r")
+    for line in fh:
+        l = line.split()
+        print(l)
+    fh.close()
 
-    question_surface = font.render(str(num1)+str(' + ')+str(num2),True,(255,255,255))
-    screen.blit(question_surface, (380,10))
 
-    correct_surface = font.render(str("Correct: ") + str(correct), True, (255, 255, 255))
-    screen.blit(correct_surface, (650, 10))
+def register():
+    new_u = input("Enter a new username: ")
+    new_pas = stdiomask.getpass(prompt="Enter a new password: (8 characters, uppercase, lowercase) ", mask="*")
+    confirm = stdiomask.getpass(prompt="Confirm password: (8 characters, uppercase, lowercase) ", mask="*")
+    if (confirm == new_pas):
+        db[new_u] = new_pas
+    else:
+        print("passwords do not match")
+    return 0
 
-    incorrect_surface = font.render(str("Incorrect: ") + str(incorrect), True, (255, 255, 255))
-    screen.blit(incorrect_surface, (650, 30))
 
-    pg.display.flip()
+def main():
+    print("not a valid command")
+    return 0
 
-    clock.tick(60)
+
+def login(use):
+    u = use
+    password = stdiomask.getpass(prompt="Enter your password: (8 characters, uppercase, lowercase) ", mask="*")
+    if (len(password) < 8 or password.islower() == True or password.isupper() == True):
+        print("invalid entry")
+        return 0
+    for i in keys:
+        if u == i:
+            if db[u] == password:
+                print("logged in")
+                return u
+    else:
+        print("incorrect username or password")
+
+
+scores = 5
+
+u = input("Enter username: ")
+
+login(u)
+
+score(u, scores)
+
+get_score()
+
+
+
